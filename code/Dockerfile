@@ -1,5 +1,5 @@
 # Use a base image with Java and Maven installed
-FROM amazoncorretto:11.0.22-al2023 as build
+FROM amazoncorretto:17.0.10-al2023-headless as build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY . /app/
 RUN ./gradlew --no-daemon build
 
 # Use a lighter base image for the final image
-FROM amazoncorretto:11.0.22-al2023-headless
+FROM amazoncorretto:17.0.10-al2023-headless
 
 # Set the working directory inside the container
 WORKDIR /app

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.restservice.RestServiceApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-03-20T14:11:36" hostname="Gabrieles-MacBook-Pro.local" time="0.387">
+<testsuite name="com.example.restservice.RestServiceApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-03-20T16:08:03" hostname="Gabrieles-MacBook-Pro.local" time="0.381">
   <properties/>
-  <testcase name="contextLoads()" classname="com.example.restservice.RestServiceApplicationTests" time="0.387"/>
-  <system-out><![CDATA[15:11:35.857 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.restservice.RestServiceApplicationTests]: RestServiceApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-15:11:35.902 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.restservice.RestServiceApplication for test class com.example.restservice.RestServiceApplicationTests
+  <testcase name="contextLoads()" classname="com.example.restservice.RestServiceApplicationTests" time="0.381"/>
+  <system-out><![CDATA[17:08:02.861 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.restservice.RestServiceApplicationTests]: RestServiceApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:08:02.903 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.restservice.RestServiceApplication for test class com.example.restservice.RestServiceApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -13,9 +13,9 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.0)
 
-2024-03-20T15:11:36.047+01:00  INFO 75898 --- [    Test worker] c.e.r.RestServiceApplicationTests        : Starting RestServiceApplicationTests using Java 17.0.10 with PID 75898 (started by gabrielemastrapasqua in /Users/gabrielemastrapasqua/source/personal/terraform_java_microservice/code)
-2024-03-20T15:11:36.048+01:00  INFO 75898 --- [    Test worker] c.e.r.RestServiceApplicationTests        : No active profile set, falling back to 1 default profile: "default"
-2024-03-20T15:11:36.481+01:00  INFO 75898 --- [    Test worker] c.e.r.RestServiceApplicationTests        : Started RestServiceApplicationTests in 0.529 seconds (process running for 0.999)
+2024-03-20T17:08:03.046+01:00  INFO 42923 --- [    Test worker] c.e.r.RestServiceApplicationTests        : Starting RestServiceApplicationTests using Java 17.0.10 with PID 42923 (started by gabrielemastrapasqua in /Users/gabrielemastrapasqua/source/personal/terraform_java_microservice/code)
+2024-03-20T17:08:03.047+01:00  INFO 42923 --- [    Test worker] c.e.r.RestServiceApplicationTests        : No active profile set, falling back to 1 default profile: "default"
+2024-03-20T17:08:03.539+01:00  INFO 42923 --- [    Test worker] c.e.r.RestServiceApplicationTests        : Started RestServiceApplicationTests in 0.584 seconds (process running for 1.087)
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
