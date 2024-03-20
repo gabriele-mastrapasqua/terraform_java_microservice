@@ -22,7 +22,7 @@ Using beanstalk can be useful because for web services give us:
 - [ ] RDS: instance size, connection port 3306 to be enabled, user/pass and endpoint outputs used by the java service as envs
 - [ ] ELB: expose the endpoint and arn
 - [ ] WAF: this service can be connected to ELB, api gw, ... so we need to attach some ACL rules + where to apply this WAF, in this case an ELB
-- [ ] java code sample: use spring boot/quarkus to create a simple api that called by a GET endpoint, will print from mysql the version or current date, to test the connection.
+- [X] java code sample: use spring boot/quarkus to create a simple api that called by a GET endpoint, will print from mysql the version or current date, to test the connection.
 - [ ] cicd: use github actions to deploy the code: we need aws cli, access envs for aws, java to test and build the code, calling aws cli to deploy on beanstalk the new version of the code
 
 ## CICD

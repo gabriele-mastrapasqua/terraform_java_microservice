@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"  # Change to your desired AWS region
+  region = "us-east-1" # Change to your desired AWS region
 }
 
 resource "aws_security_group" "beanstalk_sg" {
@@ -16,11 +16,12 @@ resource "aws_security_group" "beanstalk_sg" {
 
   // Allow outbound traffic to RDS instance on default port 3306
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [aws_security_group.rds_sg.id]
   }
+  
 }
 
 resource "aws_security_group" "rds_sg" {
@@ -29,18 +30,18 @@ resource "aws_security_group" "rds_sg" {
 
   // Allow inbound traffic from Elastic Beanstalk security group
   ingress {
-    from_port        = 3306
-    to_port          = 3306
-    protocol         = "tcp"
-    security_groups = [aws_security_group.beanstalk_sg.id]
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    #security_groups = [aws_security_group.beanstalk_sg.id]
   }
 
   // Allow outbound traffic to Elastic Beanstalk security group on port 80
   egress {
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    security_groups = [aws_security_group.beanstalk_sg.id]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    #security_groups = [aws_security_group.beanstalk_sg.id]
   }
 }
 
@@ -56,14 +57,14 @@ resource "aws_elastic_beanstalk_application_version" "app_version" {
   name        = "v1"
   application = aws_elastic_beanstalk_application.my_app.name
   description = "My Java application version 1"
-  bucket      = "my-bucket"  # Replace with your S3 bucket name
-  key         = "path/to/your/app.jar"  # Replace with your app JAR file path in S3
+  bucket      = "my-bucket"            # Replace with your S3 bucket name
+  key         = "path/to/your/app.jar" # Replace with your app JAR file path in S3
 }
 
 
 resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
-  name                = "my-beanstalk-env"
-  application         = aws_elastic_beanstalk_application.my_app.name
+  name        = "my-beanstalk-env"
+  application = aws_elastic_beanstalk_application.my_app.name
   #solution_stack_name = "64bit Amazon Linux 2 v3.4.4 running Docker 19.03.13-ce"
   solution_stack_name = "64bit Amazon Linux 2 v3.4.4 running Java 8"
 
@@ -85,7 +86,7 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
     name      = "ServiceRole"
     value     = "aws-elasticbeanstalk-service-role"
   }
-  
+
   // Attach the security group to the Elastic Beanstalk environment
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -93,51 +94,50 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
     value     = aws_security_group.beanstalk_sg.id
   }
 
-    setting {
+  setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "SERVER_PORT"  # Optional: Specify the server port if needed
-    value     = "8080"  # Example port number
+    name      = "SERVER_PORT" # Optional: Specify the server port if needed
+    value     = "8080"        # Example port number
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_HOST"        # Custom environment variable for RDS endpoint
-    value     = aws_rds_instance.db_instance.endpoint
+    name      = "DB_HOST" # Custom environment variable for RDS endpoint
+    value     = aws_db_instance.db_instance.endpoint
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_NAME"        # Custom environment variable for DB name
-    value     = aws_rds_instance.db_instance.name
+    name      = "DB_NAME" # Custom environment variable for DB name
+    value     = aws_db_instance.db_instance.db_name
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_USER"        # Custom environment variable for DB user
-    value     = aws_rds_instance.db_instance.username
+    name      = "DB_USER" # Custom environment variable for DB user
+    value     = aws_db_instance.db_instance.username
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_PASSWORD"    # Custom environment variable for DB password
-    value     = aws_rds_instance.db_instance.password
+    name      = "DB_PASSWORD" # Custom environment variable for DB password
+    value     = aws_db_instance.db_instance.password
   }
 
 
   // Deploy the application version
   depends_on = [aws_elastic_beanstalk_application_version.app_version]
-  
+
 
 }
 
-resource "aws_rds_instance" "db_instance" {
-  allocated_storage    = 20
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t2.micro"
-  name                 = "my-db-instance"
-  username             = "admin"
-  password             = "admin123"
+resource "aws_db_instance" "db_instance" {
+  allocated_storage = 20
+  engine            = "mysql"
+  engine_version    = "8.0"
+  instance_class    = "db.t2.micro"
+  username          = "admin"
+  password          = "admin123"
 
   // Attach the RDS instance to the RDS security group
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
@@ -147,9 +147,9 @@ resource "aws_rds_instance" "db_instance" {
 resource "aws_autoscaling_group" "beanstalk_asg" {
   launch_configuration = aws_elastic_beanstalk_environment.beanstalk_env.name
 
-  min_size             = 1
-  max_size             = 3  # 1 default instance + 2 spot instances
-  desired_capacity     = 1
+  min_size         = 1
+  max_size         = 3 # 1 default instance + 2 spot instances
+  desired_capacity = 1
 
   tag {
     key                 = "Name"
@@ -169,7 +169,7 @@ resource "aws_autoscaling_group" "beanstalk_asg" {
     propagate_at_launch = true
   }
 
-  target_group_arns = [aws_elastic_beanstalk_environment.beanstalk_env.load_balancers[0].arn]
+  target_group_arns = [aws_elastic_beanstalk_environment.beanstalk_env.arn]
 
   termination_policies = ["OldestInstance"]
 
@@ -177,10 +177,10 @@ resource "aws_autoscaling_group" "beanstalk_asg" {
 
 resource "aws_autoscaling_policy" "scale_policy" {
   name                   = "scale-policy"
-  scaling_adjustment      = 1
-  adjustment_type         = "ChangeInCapacity"
-  cooldown                = 300
-  autoscaling_group_name  = aws_autoscaling_group.beanstalk_asg.name
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.beanstalk_asg.name
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
@@ -204,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
 ##
 
 output "beanstalk_elb_endpoint" {
-  value = aws_elastic_beanstalk_environment.beanstalk_env.endpoint
+  value = aws_elastic_beanstalk_environment.beanstalk_env.endpoint_url
 }
 
 output "beanstalk_arn" {
@@ -212,13 +212,14 @@ output "beanstalk_arn" {
 }
 
 output "rds_endpoint" {
-  value = aws_rds_instance.db_instance.endpoint
+  value = aws_db_instance.db_instance.endpoint
 }
 
 output "rds_username" {
-  value = aws_rds_instance.db_instance.username
+  value = aws_db_instance.db_instance.username
 }
 
 output "rds_password" {
-  value = aws_rds_instance.db_instance.password
+  value = aws_db_instance.db_instance.password
+  sensitive = true
 }
