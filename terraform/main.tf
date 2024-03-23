@@ -22,12 +22,12 @@ resource "aws_security_group" "beanstalk_sg" {
 
 # we also need a iam role for beanstalk to create ec2  
 resource "aws_iam_role" "elasticbeanstalk_service_role" {
-  name               = "aws-elasticbeanstalk-service-role"
+  name        = "aws-elasticbeanstalk-service-role"
   description = "Allows Elastic Beanstalk to create and manage AWS resources on your behalf."
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AdministratorAccess-AWSElasticBeanstalk",
-  "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth",
-  "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
+    "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth",
+    "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
   ]
   assume_role_policy = <<EOF
 {
@@ -46,14 +46,14 @@ EOF
 }
 
 resource "aws_iam_role" "elasticbeanstalk_ec2_role" {
-  name               = "aws-elasticbeanstalk-ec2-role"
+  name        = "aws-elasticbeanstalk-ec2-role"
   description = "Role to link beanstalk and ec2"
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier",
     "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker",
     "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier",
     "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-    ]
+  ]
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -129,9 +129,9 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
   # needed to enable beanstalk to create ec2
   setting {
-      namespace = "aws:autoscaling:launchconfiguration"
-      name = "IamInstanceProfile"
-      value = aws_iam_instance_profile.elasticbeanstalk_ec2_instance_profile.id # was .name
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = aws_iam_instance_profile.elasticbeanstalk_ec2_instance_profile.id # was .name
   }
   setting {
     namespace = "aws:elasticbeanstalk:environment"
@@ -151,18 +151,18 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
     name      = "InstanceType"
     value     = var.ec2_instance_type
   }
-  
-  setting {
-        namespace = "aws:autoscaling:asg"
-        name      = "MaxSize"
-        value     = var.ec2_scaling_max
-    }
 
-    setting {
-        namespace = "aws:autoscaling:asg"
-        name      = "MinSize"
-        value     = var.ec2_scaling_desired
-    }
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MaxSize"
+    value     = var.ec2_scaling_max
+  }
+
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MinSize"
+    value     = var.ec2_scaling_desired
+  }
 
 
 
@@ -199,5 +199,5 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
   // Deploy the application version
   depends_on = [aws_elastic_beanstalk_application_version.app_version]
-  
+
 }

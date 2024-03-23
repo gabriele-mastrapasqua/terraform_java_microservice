@@ -5,9 +5,9 @@ resource "aws_security_group" "rds_sg" {
 
   // Allow inbound traffic from Elastic Beanstalk security group
   ingress {
-    from_port = 3306
-    to_port   = 3306
-    protocol  = "tcp"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
     #security_groups = [aws_security_group.beanstalk_sg.id]
@@ -15,9 +15,9 @@ resource "aws_security_group" "rds_sg" {
 
   // Allow outbound traffic
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
 
     #security_groups = [aws_security_group.beanstalk_sg.id]
