@@ -4,11 +4,11 @@ Java 11, mysql connector, simple api endpoint to fetch a current date from the d
 ## build locally
 
 ```bash
-./gradleW clean && ./gradleW build
+./gradlew clean && ./gradlew build
 ```
 
 ```bash
-./gradleW bootRun
+./gradlew bootRun
 ```
 
 

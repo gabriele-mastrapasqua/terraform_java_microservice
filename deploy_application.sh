@@ -16,7 +16,7 @@ BEANSTALK_S3_DEPLOY_KEY="beanstalk/${JAVA_ARTIFACT_NAME}"
 # build the jar file
 echo "build java jar..."
 cd code
-./gradleW clean && ./gradleW build
+./gradlew clean && ./gradlew build
 
 # upload the new artifact
 echo "deploy on s3 the new app version..."
