@@ -18,9 +18,6 @@ jobs:
           java-version: 17  # Set Java version to 17
           distribution: adopt
 
-      - name: Build with Gradle
-        run: ./gradleW build  # Run Gradle build
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
