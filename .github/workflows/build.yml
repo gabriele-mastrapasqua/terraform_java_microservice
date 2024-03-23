@@ -7,9 +7,8 @@ on:
         description: 'AWS access key from the caller workflow'
         required: true
       AWS_SECRET_ACCESS_KEY:
-        description: 'AWS access key from the caller workflow'
+        description: 'AWS secret key from the caller workflow'
         required: true
-
   push:
     branches:
       - main  # Change this to your main branch name
@@ -17,6 +16,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    environment: deploy # load envs and secrets from gh
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2  # Checkout the code from the repository
