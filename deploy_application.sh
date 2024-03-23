@@ -18,6 +18,9 @@ echo "build java jar..."
 cd code
 ./gradlew clean && ./gradlew build
 
+# test
+tree code
+
 # upload the new artifact
 echo "deploy on s3 the new app version..."
 aws s3 cp "build/libs/${JAVA_ARTIFACT_NAME}" "s3://${BEANSTALK_S3_DEPLOY_BUCKET}/${BEANSTALK_S3_DEPLOY_KEY}"
