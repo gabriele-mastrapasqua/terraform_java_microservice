@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1" # Change to your desired AWS region
-}
-
 resource "aws_security_group" "beanstalk_sg" {
   name        = "beanstalk-sg"
   description = "Security group for Elastic Beanstalk environment"
@@ -21,28 +17,7 @@ resource "aws_security_group" "beanstalk_sg" {
     protocol        = "-1"
     security_groups = [aws_security_group.rds_sg.id]
   }
-  
-}
 
-resource "aws_security_group" "rds_sg" {
-  name        = "rds-sg"
-  description = "Security group for RDS instance"
-
-  // Allow inbound traffic from Elastic Beanstalk security group
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    #security_groups = [aws_security_group.beanstalk_sg.id]
-  }
-
-  // Allow outbound traffic to Elastic Beanstalk security group on port 80
-  egress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    #security_groups = [aws_security_group.beanstalk_sg.id]
-  }
 }
 
 ###
@@ -50,29 +25,29 @@ resource "aws_security_group" "rds_sg" {
 ###
 
 resource "aws_elastic_beanstalk_application" "my_app" {
-  name = "my-beanstalk-app"
+  name = var.beanstalk_app_name
 }
 
 resource "aws_elastic_beanstalk_application_version" "app_version" {
-  name        = "v1"
+  name        = var.beanstalk_app_version
   application = aws_elastic_beanstalk_application.my_app.name
-  description = "My Java application version 1"
+  description = "My Java micro application version 1"
   bucket      = "my-bucket"            # Replace with your S3 bucket name
   key         = "path/to/your/app.jar" # Replace with your app JAR file path in S3
 }
 
 
 resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
-  name        = "my-beanstalk-env"
+  name        = var.beanstalk_env_name
   application = aws_elastic_beanstalk_application.my_app.name
   #solution_stack_name = "64bit Amazon Linux 2 v3.4.4 running Docker 19.03.13-ce"
-  solution_stack_name = "64bit Amazon Linux 2 v3.4.4 running Java 8"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.2.1 running Corretto 17"
 
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.micro"
+    value     = var.ec2_instance_type
   }
 
   setting {
@@ -96,8 +71,8 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "SERVER_PORT" # Optional: Specify the server port if needed
-    value     = "8080"        # Example port number
+    name      = "SERVER_PORT"          # Optional: Specify the server port if needed
+    value     = var.beanstalk_app_port # Example port number
   }
 
   setting {
@@ -131,25 +106,13 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
 }
 
-resource "aws_db_instance" "db_instance" {
-  allocated_storage = 20
-  engine            = "mysql"
-  engine_version    = "8.0"
-  instance_class    = "db.t2.micro"
-  username          = "admin"
-  password          = "admin123"
-
-  // Attach the RDS instance to the RDS security group
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-
-}
 
 resource "aws_autoscaling_group" "beanstalk_asg" {
   launch_configuration = aws_elastic_beanstalk_environment.beanstalk_env.name
 
   min_size         = 1
-  max_size         = 3 # 1 default instance + 2 spot instances
-  desired_capacity = 1
+  max_size         = var.ec2_scaling_max # 1 default ondemand instance; 3 max if scaling
+  desired_capacity = var.ec2_scaling_desired
 
   tag {
     key                 = "Name"
@@ -198,28 +161,4 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.beanstalk_asg.name
   }
-}
-
-##
-##
-
-output "beanstalk_elb_endpoint" {
-  value = aws_elastic_beanstalk_environment.beanstalk_env.endpoint_url
-}
-
-output "beanstalk_arn" {
-  value = aws_elastic_beanstalk_environment.beanstalk_env.arn
-}
-
-output "rds_endpoint" {
-  value = aws_db_instance.db_instance.endpoint
-}
-
-output "rds_username" {
-  value = aws_db_instance.db_instance.username
-}
-
-output "rds_password" {
-  value = aws_db_instance.db_instance.password
-  sensitive = true
 }
