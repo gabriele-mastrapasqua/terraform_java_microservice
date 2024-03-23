@@ -19,7 +19,8 @@ cd code
 ./gradlew clean && ./gradlew build
 
 # test
-tree code
+tree .
+
 
 # upload the new artifact
 echo "deploy on s3 the new app version..."
