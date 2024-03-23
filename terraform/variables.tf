@@ -68,3 +68,9 @@ variable "rds_password" {
   default     = "admin123"
   sensitive   = true
 }
+
+variable "java_application_artifact_name" {
+  description = "Java Jar name to use"
+  type        = string
+  default     = "rest-service-0.0.1-SNAPSHOT.jar"
+}

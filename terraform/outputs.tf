@@ -20,7 +20,7 @@ output "rds_endpoint" {
 }
 
 output "rds_username" {
-  value = aws_db_instance.db_instance.username
+  value     = aws_db_instance.db_instance.username
   sensitive = true
 }
 

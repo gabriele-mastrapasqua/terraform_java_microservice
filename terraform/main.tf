@@ -24,6 +24,19 @@ resource "aws_security_group" "beanstalk_sg" {
 ###
 ###
 
+
+# bucket to deploy the application artifacts
+resource "aws_s3_bucket" "default" {
+  bucket = "${var.beanstalk_env_name}.applicationversion.bucket"
+}
+
+resource "aws_s3_object" "default" {
+  bucket = aws_s3_bucket.default.id
+  key    = "beanstalk/${var.java_application_artifact_name}"
+  source = "..code/build/libs/${var.java_application_artifact_name}"
+}
+
+
 resource "aws_elastic_beanstalk_application" "my_app" {
   name = var.beanstalk_app_name
 }
@@ -32,8 +45,8 @@ resource "aws_elastic_beanstalk_application_version" "app_version" {
   name        = var.beanstalk_app_version
   application = aws_elastic_beanstalk_application.my_app.name
   description = "My Java micro application version 1"
-  bucket      = "my-bucket"            # Replace with your S3 bucket name
-  key         = "path/to/your/app.jar" # Replace with your app JAR file path in S3
+  bucket      = aws_s3_bucket.default.id
+  key         = aws_s3_object.default.id
 }
 
 
