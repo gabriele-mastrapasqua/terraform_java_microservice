@@ -19,7 +19,9 @@ cd code
 ./gradlew clean && ./gradlew build
 
 # test
-tree .
+aws --version
+echo "print all ENVs"
+export
 
 
 # upload the new artifact
