@@ -25,13 +25,18 @@ jobs:
           aws --version  # Verify AWS CLI installation
 
       - name: Deploy new application new version on beanstalk
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
         run: |
           export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
           export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          echo $AWS_ACCESS_KEY_ID >> .env
+          cat .env
+          echo "test 2 "
+          echo ${{secrets.AWS_ACCESS_KEY_ID}}
+          echo "run script"
           ./deploy_application.sh
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: us-east-1
-
+        
      
