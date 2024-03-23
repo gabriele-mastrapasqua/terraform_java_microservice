@@ -1,4 +1,4 @@
-name: Java Build, S3 Upload, and Beanstalk Update
+name: Java Build and Beanstalk Update
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy application new version
+      - name: Deploy new application new version on beanstalk
         #run: aws s3 cp build/libs/*.jar s3://your-bucket-name/  # Update with your S3 bucket name
         run: ./deploy_application.sh
 
