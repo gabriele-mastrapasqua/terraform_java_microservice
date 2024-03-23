@@ -20,6 +20,68 @@ resource "aws_security_group" "beanstalk_sg" {
 
 }
 
+# we also need a iam role for beanstalk to create ec2  
+resource "aws_iam_role" "elasticbeanstalk_service_role" {
+  name               = "aws-elasticbeanstalk-service-role"
+  description = "Allows Elastic Beanstalk to create and manage AWS resources on your behalf."
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AdministratorAccess-AWSElasticBeanstalk",
+  "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth",
+  "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
+  ]
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "elasticbeanstalk.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "elasticbeanstalk_ec2_role" {
+  name               = "aws-elasticbeanstalk-ec2-role"
+  description = "Role to link beanstalk and ec2"
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier",
+    "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker",
+    "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
+    ]
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach policies to the IAM role as needed
+resource "aws_iam_role_policy_attachment" "elasticbeanstalk_ec2_role_attachment" {
+  role       = aws_iam_role.elasticbeanstalk_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
+}
+
+
+resource "aws_iam_instance_profile" "elasticbeanstalk_ec2_instance_profile" {
+  name = "aws-elasticbeanstalk-ec2-instance-profile"
+  role = aws_iam_role.elasticbeanstalk_ec2_role.name
+}
+
+
 ###
 ###
 ###
@@ -27,14 +89,15 @@ resource "aws_security_group" "beanstalk_sg" {
 
 # bucket to deploy the application artifacts
 resource "aws_s3_bucket" "default" {
-  bucket = "${var.beanstalk_env_name}.applicationversion.bucket"
+  bucket = var.s3_deploy_artifact_bucket_name
 }
 
 resource "aws_s3_object" "default" {
   bucket = aws_s3_bucket.default.id
   key    = "beanstalk/${var.java_application_artifact_name}"
-  source = "..code/build/libs/${var.java_application_artifact_name}"
+  source = "../code/build/libs/${var.java_application_artifact_name}"
 }
+
 
 
 resource "aws_elastic_beanstalk_application" "my_app" {
@@ -58,29 +121,49 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
 
   setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "InstanceType"
-    value     = var.ec2_instance_type
-  }
-
-  setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
     value     = "LoadBalanced"
   }
 
+  # needed to enable beanstalk to create ec2
+  setting {
+      namespace = "aws:autoscaling:launchconfiguration"
+      name = "IamInstanceProfile"
+      value = aws_iam_instance_profile.elasticbeanstalk_ec2_instance_profile.id # was .name
+  }
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "ServiceRole"
-    value     = "aws-elasticbeanstalk-service-role"
+    value     = aws_iam_role.elasticbeanstalk_service_role.name
   }
 
   // Attach the security group to the Elastic Beanstalk environment
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "SecurityGroups"
-    value     = aws_security_group.beanstalk_sg.id
+    value     = aws_security_group.beanstalk_sg.name # check, this should be .id!
   }
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = var.ec2_instance_type
+  }
+  
+  setting {
+        namespace = "aws:autoscaling:asg"
+        name      = "MaxSize"
+        value     = var.ec2_scaling_max
+    }
+
+    setting {
+        namespace = "aws:autoscaling:asg"
+        name      = "MinSize"
+        value     = var.ec2_scaling_desired
+    }
+
+
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
@@ -115,63 +198,5 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
 
   // Deploy the application version
   depends_on = [aws_elastic_beanstalk_application_version.app_version]
-
-
-}
-
-
-resource "aws_autoscaling_group" "beanstalk_asg" {
-  launch_configuration = aws_elastic_beanstalk_environment.beanstalk_env.name
-
-  min_size         = 1
-  max_size         = var.ec2_scaling_max # 1 default ondemand instance; 3 max if scaling
-  desired_capacity = var.ec2_scaling_desired
-
-  tag {
-    key                 = "Name"
-    value               = "beanstalk-app-instance"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = "production"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Role"
-    value               = "webserver"
-    propagate_at_launch = true
-  }
-
-  target_group_arns = [aws_elastic_beanstalk_environment.beanstalk_env.arn]
-
-  termination_policies = ["OldestInstance"]
-
-}
-
-resource "aws_autoscaling_policy" "scale_policy" {
-  name                   = "scale-policy"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
-  autoscaling_group_name = aws_autoscaling_group.beanstalk_asg.name
-}
-
-resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
-  alarm_name          = "cpu-utilization-alarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 2
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = 300
-  statistic           = "Average"
-  threshold           = 70
-  alarm_description   = "Alarm when CPU utilization exceeds 70% for 2 periods"
-  alarm_actions       = [aws_autoscaling_policy.scale_policy.arn]
-
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.beanstalk_asg.name
-  }
+  
 }

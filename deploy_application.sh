@@ -7,10 +7,10 @@
 # change names accordingly, override also terraform vars in the case.
 #
 JAVA_JAR_NAME="rest-service-0.0.1-SNAPSHOT"
-BEANSTALK_APP_NAME="JavaMicroTerraformTestApp"
-BEANSTALK_ENV_NAME="JavaMicroTerraformTestEnv"
+BEANSTALK_APP_NAME="java-terraform-test-app"
+BEANSTALK_ENV_NAME="java-terraform-test-env"
 BEANSTALK_APP_VERSION="v1"
-BEANSTALK_S3_DEPLOY_BUCKET="${BEANSTALK_ENV_NAME}.applicationversion.bucket"
+BEANSTALK_S3_DEPLOY_BUCKET="s3_deploy_artifact_bucket_name"
 BEANSTALK_S3_DEPLOY_KEY="beanstalk/${JAVA_JAR_NAME}"
 
 # build the jar file
