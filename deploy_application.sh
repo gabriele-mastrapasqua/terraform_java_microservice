@@ -22,6 +22,7 @@ cd code
 aws --version
 echo "print all ENVs"
 export
+echo "access key ${AWS_ACCESS_KEY_ID}"
 
 
 # upload the new artifact
