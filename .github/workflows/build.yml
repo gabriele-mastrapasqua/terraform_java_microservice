@@ -38,7 +38,8 @@ jobs:
           export AWS_DEFAULT_REGION=us-east-1
 
       - name: Deploy new application new version on beanstalk
-        #run: aws s3 cp build/libs/*.jar s3://your-bucket-name/  # Update with your S3 bucket name
-        run: ./deploy_application.sh
+        run: |
+          ls -l  
+          ./deploy_application.sh
 
      
