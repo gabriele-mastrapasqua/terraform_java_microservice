@@ -18,6 +18,13 @@ jobs:
           java-version: 17  # Set Java version to 17
           distribution: adopt
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -25,18 +32,7 @@ jobs:
           aws --version  # Verify AWS CLI installation
 
       - name: Deploy new application new version on beanstalk
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
         run: |
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          echo $AWS_ACCESS_KEY_ID >> .env
-          cat .env
-          echo "test 2 "
-          echo ${{secrets.AWS_ACCESS_KEY_ID}}
-          echo "run script"
           ./deploy_application.sh
         
      

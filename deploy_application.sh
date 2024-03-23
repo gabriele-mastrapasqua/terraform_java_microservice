@@ -21,8 +21,6 @@ cd code
 # test
 echo "print all ENVs"
 export
-echo $AWS_ACCESS_KEY_ID >> .env
-cat .env
 
 
 # upload the new artifact
