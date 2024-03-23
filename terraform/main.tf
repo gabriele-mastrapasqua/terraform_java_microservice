@@ -51,7 +51,8 @@ resource "aws_iam_role" "elasticbeanstalk_ec2_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier",
     "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker",
-    "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
+    "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier",
+    "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
     ]
   assume_role_policy = <<EOF
 {
