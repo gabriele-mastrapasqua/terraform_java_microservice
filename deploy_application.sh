@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #
 # NOTE: those variables values must be the same of the terraform vars used to bootstrp
@@ -6,21 +6,21 @@
 #
 # change names accordingly, override also terraform vars in the case.
 #
-JAVA_JAR_NAME="rest-service-0.0.1-SNAPSHOT"
+JAVA_ARTIFACT_NAME="rest-service-0.0.1-SNAPSHOT.zip"
 BEANSTALK_APP_NAME="java-terraform-test-app"
 BEANSTALK_ENV_NAME="java-terraform-test-env"
 BEANSTALK_APP_VERSION="v1"
-BEANSTALK_S3_DEPLOY_BUCKET="s3_deploy_artifact_bucket_name"
-BEANSTALK_S3_DEPLOY_KEY="beanstalk/${JAVA_JAR_NAME}"
+BEANSTALK_S3_DEPLOY_BUCKET="java-test-artifacts-beanstalk"
+BEANSTALK_S3_DEPLOY_KEY="beanstalk/${JAVA_ARTIFACT_NAME}"
 
 # build the jar file
 echo "build java jar..."
 cd code
-./gradleW clean && ./gradleW build
+./gradleW clean && ./gradleW build && ./gradleW createDistribution
 
 # upload the new artifact
 echo "deploy on s3 the new app version..."
-aws s3 cp code/build/libs/$JAVA_JAR_NAME s3://$BEANSTALK_S3_DEPLOY__BUCKET/$BEANSTALK_S3_DEPLOY_KEY
+aws s3 cp "build/distributions/${JAVA_ARTIFACT_NAME}" "s3://${BEANSTALK_S3_DEPLOY_BUCKET}/${BEANSTALK_S3_DEPLOY_KEY}"
 
 # update beanstalk env with the new app
 echo "update beanstalk with the new app version..."

@@ -95,7 +95,7 @@ resource "aws_s3_bucket" "default" {
 resource "aws_s3_object" "default" {
   bucket = aws_s3_bucket.default.id
   key    = "beanstalk/${var.java_application_artifact_name}"
-  source = "../code/build/libs/${var.java_application_artifact_name}"
+  source = "../code/build/distributions/${var.java_application_artifact_name}"
 }
 
 

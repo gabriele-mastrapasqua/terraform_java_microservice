@@ -30,7 +30,7 @@ variable "beanstalk_app_version" {
 variable "beanstalk_app_port" {
   description = "Beanstalk app server port to use"
   type        = string
-  default     = "8080"
+  default     = "5000"
 }
 
 
@@ -77,7 +77,7 @@ variable "rds_password" {
 variable "java_application_artifact_name" {
   description = "Java Jar name to use"
   type        = string
-  default     = "rest-service-0.0.1-SNAPSHOT.jar"
+  default     = "rest-service-0.0.1-SNAPSHOT.zip"
 }
 
 variable "s3_deploy_artifact_bucket_name" {

@@ -25,3 +25,57 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+// add beanstalk extensions to the package
+/*bootJar {
+    from('./.ebextensions') { into '.ebextensions' }
+}*/
+
+// remove plain jar, create only the fat jar
+jar {
+    enabled = false
+    // Remove `plain` postfix from jar file name
+    archiveClassifier.set("")
+}
+
+// Create a distribution ZIP task
+task createDistribution(type: Zip) {
+    // Define the ZIP file name and destination directory
+    archiveFileName = "${project.name}-${project.version}.zip"
+    destinationDir = file("$buildDir/distributions")
+
+    // Include the JAR file
+    from jar.outputs.files
+	//from tasks.named('jar').get().outputs.files
+
+
+    // Include the .ebextensions folder
+    //from file(".ebextensions")
+    
+	// include dir and all config files  used by beanstalk
+	from(".ebextensions") {
+		include "*"
+		into ".ebextensions"
+	}
+
+	//copy(file:".ebextensions", tofile:".ebextensions")
+	/*doLast{
+		copy {
+			from '.'
+			into '.'
+			include '*'
+			include '.ebextensions/**'
+		}
+	}*/
+
+    // Set permissions for the files in the ZIP (optional)
+    /*eachFile {
+        // Set permissions for files in .ebextensions folder
+        if (it.relativePath.startsWith(".ebextensions")) {
+            it.mode = 0755  // Example: Set executable permissions
+        }
+    }*/
+}
+
+// Make the createDistribution task depend on the build task
+createDistribution.dependsOn build

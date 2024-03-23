@@ -17,7 +17,7 @@ services:
   spring-app:
     build: .
     ports:
-      - "8080:8080"
+      - "8080:5000"
     environment:
       DB_HOST: mysql-db:3306
       DB_NAME: db_test
