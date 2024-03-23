@@ -19,10 +19,10 @@ cd code
 ./gradlew clean && ./gradlew build
 
 # test
-aws --version
 echo "print all ENVs"
 export
-echo "access key ${AWS_ACCESS_KEY_ID}"
+echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> .env
+cat .env
 
 
 # upload the new artifact
