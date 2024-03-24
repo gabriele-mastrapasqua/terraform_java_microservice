@@ -38,6 +38,9 @@ I have omitted some features for keep things simple for this test, but those can
 - [ ] RDS backups and scaling configuration and snapshot policies
 - [ ] S3 lifecycle to remove old artifacts after a while
 - [ ] DNS and certificate manager usage for the ELB
+- [ ] usage of only ENVs / tfvars for terraform variables and not using defaults values
+- [ ] usage of only ENVs for the deployemnt script in CICD and not hardcoded variables
+- [ ] terraform integration tests
 
 
 
