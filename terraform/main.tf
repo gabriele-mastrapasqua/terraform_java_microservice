@@ -127,6 +127,14 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_env" {
     value     = "LoadBalanced"
   }
 
+  # load balancer settings
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+
+
   # needed to enable beanstalk to create ec2
   setting {
     namespace = "aws:autoscaling:launchconfiguration"

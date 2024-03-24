@@ -35,4 +35,7 @@ resource "aws_db_instance" "db_instance" {
   // Attach the RDS instance to the RDS security group
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
+  // required to clean destroy from terraform
+  final_snapshot_identifier = "ci-mysql-backup"
+  skip_final_snapshot = true
 }
