@@ -1,14 +1,11 @@
 # Terraform beanstalk
 This is a test in terraform to create a Beanstalk java microservice with RDS.
 
-
-## How to deploy infra and the v1 of the code
-
 ## Build the code artifact
 Run: 
 ```bash 
 cd ../code
-./gradleW clean && ./gradleW build
+./gradlew clean && ./gradlew build
 ```
 this will generate a jar file.
 
@@ -22,4 +19,5 @@ Then run:
 terraform init
 terraform plan
 terraform apply -auto-approve
+terraform destroy
 ```
